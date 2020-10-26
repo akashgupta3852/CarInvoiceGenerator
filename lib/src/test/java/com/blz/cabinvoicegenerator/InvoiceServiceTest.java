@@ -30,7 +30,8 @@ public class InvoiceServiceTest {
 
 	@Test
 	public void givenMultipleRides_ShouldReturnInvoiceSummary() {
-		Ride[] rides = { new Ride(2.0, 5), new Ride(0.1, 1) };
+		Ride[] rides = { new Ride(2.0, 5, InvoiceGenerator.RideType.NORMAL),
+				new Ride(0.1, 1, InvoiceGenerator.RideType.NORMAL) };
 		InvoiceSummary invoiceSummary = invoiceGenerator.calculateFare(rides);
 		InvoiceSummary expectedInvoiceSummary = new InvoiceSummary(2, 30.0);
 		Assert.assertEquals(expectedInvoiceSummary, invoiceSummary);
@@ -39,10 +40,28 @@ public class InvoiceServiceTest {
 	@Test
 	public void givenUserIdAndRides_ShouldReturnInvoiceSummary() {
 		String userId = "a@b.com";
-		Ride[] rides = { new Ride(2.0, 5), new Ride(0.1, 1) };
+		Ride[] rides = { new Ride(2.0, 5, InvoiceGenerator.RideType.NORMAL),
+				new Ride(0.1, 1, InvoiceGenerator.RideType.NORMAL) };
 		invoiceGenerator.addRides(userId, rides);
 		InvoiceSummary invoiceSummary = invoiceGenerator.getInvoiceSummary(userId);
 		InvoiceSummary expectedInvoiceSummary = new InvoiceSummary(2, 30.0);
+		Assert.assertEquals(expectedInvoiceSummary, invoiceSummary);
+	}
+
+	@Test
+	public void givenUserIdAndRides_ShouldReturnMultipleInvoiceSummary() {
+		String userId = "a@b.com";
+		Ride[] rides1 = { new Ride(2.0, 5, InvoiceGenerator.RideType.NORMAL),
+				new Ride(0.1, 1, InvoiceGenerator.RideType.NORMAL) };
+		invoiceGenerator.addRides(userId, rides1);
+		Ride[] rides2 = { new Ride(2.0, 5, InvoiceGenerator.RideType.PREMIUM),
+				new Ride(0.1, 1, InvoiceGenerator.RideType.PREMIUM) };
+		invoiceGenerator.addRides(userId, rides2);
+		Ride[] rides3 = { new Ride(2.0, 5, InvoiceGenerator.RideType.PREMIUM),
+				new Ride(0.1, 1, InvoiceGenerator.RideType.NORMAL) };
+		invoiceGenerator.addRides(userId, rides3);
+		InvoiceSummary invoiceSummary = invoiceGenerator.getInvoiceSummary(userId);
+		InvoiceSummary expectedInvoiceSummary = new InvoiceSummary(6, 135);
 		Assert.assertEquals(expectedInvoiceSummary, invoiceSummary);
 	}
 }
